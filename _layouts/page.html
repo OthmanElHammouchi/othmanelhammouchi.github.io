@@ -1,14 +1,11 @@
 ---
 layout: default
 ---
-<article class="post">
+<article class="container mx-auto px-2">
 
-  <header class="post-header">
-    <h1 class="post-title">{{ page.title | escape }}</h1>
-  </header>
+  {% include page_heading.html %}
 
-  <div class="post-content">
+  <div class="prose mb-4 py-4">
     {{ content }}
   </div>
-
 </article>

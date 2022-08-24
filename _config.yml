@@ -9,7 +9,7 @@ github_username:  OthmanElHammouchi
 
 # Build settings
 markdown: kramdown
-theme: minima
+theme: jekyll-athena
 plugins:
   - jekyll-feed
 
