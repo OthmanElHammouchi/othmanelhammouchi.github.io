@@ -1,20 +1,31 @@
 ---
 layout: post
-title:  "Image segmentation with Mumford-Shah: Introduction"
+title:  "Introduction to the Mumford-Shah functional" 
+subtitle: "Variational image segmentation - part 1"
 date:   2022-08-14 16:43:55 +0200
 ---
 
-Image segmentation is the task of seperating a given input image into two parts: a collection of contiguous *regions* corresponding to objects and other surfaces, and a set of *edges* giving the boundaries between them. It has a great number applications, ranging from medical imaging to computer vision to inpainting. Many different segmentation models have been developed over the years, each having their own particular strenghts and weaknesses. The approach which I will be exploring in this series of articles belongs to the family of so-called *variational methods*, which rely on results from functional analysis. Devised by the mathematicians David Mumford and Jayant Shah in 1989, it has the distinct advantage of being edge-preserving.
+*This is the first in a series of articles exploring the Mumford-Shah model in variational image segmentation.*
+
+Image segmentation is the task of seperating a given input image into two parts: a collection of contiguous *regions* corresponding to objects and other surfaces, and a set of *edges* giving the boundaries between them. It has a great number applications, ranging from medical imaging to computer vision to inpainting. Many different segmentation models have been developed over the years, each having their own particular strenghts and weaknesses. The approach which we will be exploring in this series of articles belongs to the family of so-called *variational methods*, which rely on results from functional analysis. Devised by the mathematicians David Mumford and Jayant Shah in 1989, it has the distinct advantage of being edge-preserving.
 
 This series consists of 3 parts. The present article serves as a gentle introduction to variational image segmentation by way of the Mumford-Shah framework. No special background is required beyond introductory calculus. In the next article, I will dive more deeply into the theory behind this method. Lastly,  we'll take a look at an implementation of Mumford-Shah segmentation using the FEniCS library in Python. To wet the reader's appetite, here's an example of the final result.
 
-Original image:
+![Stanislaw Mazur presents Per Enflo with a goose](/assets/image.png) \\
+<span>Original image</span>{:style="color:grey; font-size:small"}
+{:style="display:block; margin:35px; text-align:center"}
 
-![Stanislaw Mazur presents Per Enflo with a goose](/assets/image.png){:style="display:block; margin-left:auto; margin-right:auto"}
-
-Segmentation:
-
-![Regions](/assets/cartoon.png) ![Edges](/assets/edges.png) 
+<div style="overflow: auto">
+	<div style="float: left; width: 45%">
+		<img src="/assets/cartoon.png">
+	</div>
+	<div style="float: right; width: 45%">
+		<img src="/assets/edges.png">
+	</div>
+	<div style = "padding-top: 10px">
+		<p style="color:grey; font-size:small">Segmentation</p>
+	</div>
+</div>{:style="display:block; margin:35px; text-align:center"}
 
 Looks pretty cool, huh? Have I got you excited? Then let's dive right in!
 

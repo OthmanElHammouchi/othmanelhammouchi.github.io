@@ -1,18 +1,28 @@
 ---
 layout: post
-title:  "Image segmentation with Mumford-Shah: Implementation"
+title:  "Coding up an image segmentation algorithm using Python"
+subtitle: "Variational image segmentation - part 3"
 date:   2022-08-14 16:43:55 +0200
 ---
-Hi! 
+
+*This is the final article in my series on variational image segmentation with the Mumford-Shah functional. The previous parts can be found [here]({% post_url 2022-08-14-mumford-shah-intro %}) and [here]({% post_url 2022-08-14-mumford-shah-theory %}).*
+
+In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
+
+$$
+\begin{cases}
+	\displaystyle
+	(u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\
+	\displaystyle
+	v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0
+\end{cases}
+$$
+
+which we can solve to obtain a pair of approximations $(u_\epsilon, v_\epsilon)$. We have seen that as $\epsilon \to 0$, the corresponding approximations converge to $(u, I_K)$. All that remains for us, then, is to code this up. We'll use the [FEniCS](https://fenicsproject.org/) finite element library for Python, which allows us to write code very close to the original mathematics.
+
+Let's begin by importing our image and mapping it onto 
 
 {% highlight python %}
-import numpy as np
-import matplotlib.pyplot as plt
-import cv2
-from fenics import *
-import subprocess
-from helpers import *
-import inspect
 
 img = cv2.imread("image.png", cv2.IMREAD_GRAYSCALE)
 
