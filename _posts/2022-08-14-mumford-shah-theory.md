@@ -12,13 +12,13 @@ J[u, K] := \int_{\Omega}(u - g)^2 \, dx + \int_{\Omega}\left \Vert \nabla u \rig
 \end{equation}
 $$
 
-While this provides us with the necessary theoretical foundation, we still have a long way to go before we can turn this analytic expression into a formulation which can actually be solved on a computer. The usual way to solve variational problems is to convert them to a system of PDEs known as the *Euler-Lagrange* equations. This approach has its original in analytical mechanics, an alternative formulation of Newton's laws which uses the *energy* of a mechanical system to describe its time-evolution. If $\bm{q}: [t_1, t_2] \rightarrow \mathbb{R}^3$ represents the position of a particle going from point $\bm{a}$ to $\bm{b}$, then the *principle of stationary action* states that $\bm{q}$ minimises the *action*
+While this provides us with the necessary theoretical foundation, we still have a long way to go before we can turn this analytic expression into a formulation which can actually be solved on a computer. The usual way to solve variational problems is to convert them to a system of PDEs known as the *Euler-Lagrange* equations. This approach has its original in analytical mechanics, an alternative formulation of Newton's laws which uses the *energy* of a mechanical system to describe its time-evolution. If $\boldsymbol{q}: [t_1, t_2] \rightarrow \mathbb{R}^3$ represents the position of a particle going from point $\boldsymbol{a}$ to $\boldsymbol{b}$, then the *principle of stationary action* states that $\boldsymbol{q}$ minimises the *action*
 
 $$
-\int_{t_1}^{t_2} \mathcal{L}(t, \bm{q}, \dot{\bm{q}}) \, dt
+\int_{t_1}^{t_2} \mathcal{L}(t, \boldsymbol{q}, \dot{\boldsymbol{q}}) \, dt
 $$
 
-among all continuously differentiable paths $C^1([t_1, t_2], \mathbb{R}^3)$. It can be shown that this is equivalent to requiring that $\bm{q}$ satisfy the equations
+among all continuously differentiable paths $C^1([t_1, t_2], \mathbb{R}^3)$. It can be shown that this is equivalent to requiring that $\boldsymbol{q}$ satisfy the equations
 
 $$
 \frac{\partial \mathcal{L}}{\partial q_i} = \frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot{q_i}} \quad i \in \{1, 2, 3 \}\,.
@@ -26,8 +26,6 @@ $$
 
 The obstacle preventing us from to applying this to (1) is the presence of the Hausdorff measure term $\mathcal{H}^1(K)$. In order to overcome this, we introduce a new function $v: \Omega \rightarrow [0, 1]$ which approximates the indicator function of K.
 
-
-
 $$
-
+AT_\epsilon(u, v) := \int_\Omega (u - g)^2 \, dx + \int_\Omega v^2 \Vert \nabla u \Vert^2 \, dx + \int_\Omega \left(\epsilon \vert v \vert^2 + \frac{(1 - v)^2}{\epsilon} \right) \, dx
 $$
