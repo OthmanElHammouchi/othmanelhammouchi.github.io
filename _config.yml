@@ -1,11 +1,12 @@
 
 title: Othman El Hammouchi
-email: your-email@example.com
-description: >- # this means to ignore newlines until "baseurl:"
+email: contact@othmanelhammouchi.com
+description: >-
   A master's student's journey through the world of applied and financial mathematics.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: ""
+url: "https://othmanelhammouchi.com/"
 github_username:  OthmanElHammouchi
+linkedin_username: othman-el-hammouchi
 
 # Build settings
 markdown: kramdown
