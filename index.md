@@ -23,7 +23,7 @@ img {
 .column {
   float: left;
   width: 40%;
-  margin: auto
+  margin: 25px
 }
 
 .row:after {
