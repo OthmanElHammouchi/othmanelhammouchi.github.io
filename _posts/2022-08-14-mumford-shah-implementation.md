@@ -12,7 +12,7 @@ In the previous article, we discussed the challenges with the numerical implemen
 $$
 \begin{cases}
 	\displaystyle
-	(u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\
+	(u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[10px]
 	\displaystyle
 	v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0
 \end{cases}
@@ -20,30 +20,44 @@ $$
 
 which we can solve to obtain a pair of approximations $(u_\epsilon, v_\epsilon)$. We have seen that as $\epsilon \to 0$, the corresponding approximations converge to $(u, I_K)$. All that remains for us, then, is to code this up. We'll use the [FEniCS](https://fenicsproject.org/) finite element library for Python, which allows us to write code very close to the original mathematics.
 
-Let's begin by importing our image and mapping it onto 
+In order to apply the finite element method, we first have to put our PDE into a different form called the *weak formulation*. This is achieved by multiplying both sides by a so-called *test function* and integrating on the domain:
+
+$$
+\begin{cases}
+	\displaystyle
+	\int_\Omega (u - g) \, w \, dx - \int_\Omega w \, \nabla \cdot (v^2 \nabla u) \, dx = 0 \\[10px]
+	\displaystyle
+	\int_\Omega w \, v \Vert \nabla u \Vert^2 \, dx + \frac{1}{4\epsilon}\int_\Omega w v\,  \, dx - \int_\Omega \epsilon \Delta v \, w\, dx = \frac{1}{4\epsilon} \int_\Omega w \, dx \,.
+\end{cases}
+$$
+
+Next, we integrate by parts to reduce by 1 the order of the highest derivative:
+
+$$
+\begin{cases}
+	\displaystyle
+	\int_\Omega (u - g) \, w \, dx - \int_\Omega v^2 \, \nabla w \cdot \nabla u \, dx = 0 \\[10px]
+	\displaystyle
+	\int_\Omega w \, v \Vert \nabla u \Vert^2 \, dx + \int_\Omega \frac{w \, v}{4\epsilon} \, dx - \int_\Omega \epsilon \nabla v \cdot \nabla w \, dx =  \int_\Omega \frac{w}{4\epsilon} \, dx \,.
+\end{cases}
+$$
+
+In FEniCS, these equations can be written as
 
 {% highlight python %}
 
-img = cv2.imread("image.png", cv2.IMREAD_GRAYSCALE)
+L = g*w*dx
+a = u*w*dx + beta*(v**2)*dot(grad(u), grad(w))*dx
 
-Lx = float(img.shape[1])/float(img.shape[0])
-Ly = 1.
-
-mesh = RectangleMesh(Point(0,0),Point(Lx,Ly), 500, 500, "crossed")
-V = FunctionSpace(mesh, "Lagrange", 1)
-trueImage = Image(Lx, Ly, img)
-g  = interpolate(trueImage, V)
-
-eps = 1e-6
-alpha = 1
-beta = 1
-
-cartoon = g
-
-maxiter = 5
-iter = 1
-while iter <= maxiter:
-	edges = solve_edges(cartoon, eps, V, alpha, beta)
-	cartoon = solve_cartoon(edges, eps, g, V, beta)
-	iter += 1
 {% endhighlight %}
+
+and 
+
+{% highlight python %}
+
+a = dot(grad(u), grad(u))*beta*v*w*dx + eps*alpha*dot(grad(v), grad(w))*dx + alpha/(4*eps)*v*w*dx
+L = Constant(alpha/(4*eps))*w*dx
+
+{% endhighlight %}
+
+respectively.

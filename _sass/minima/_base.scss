@@ -59,17 +59,41 @@ img {
   vertical-align: middle;
 }
 
+.image-cropper {
+  width: 250px;
+  height: 250px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 35px;
+  overflow: hidden;
+  border-radius: 50%;
+}
 
+.image-cropper > img {
+  height: 100%;
+  width: auto;
+  object-fit: cover;
+}
 
 /**
  * Figures
  */
-figure > img {
-  display: block;
+.multi-image {
+  gap: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+figure {
+  margin: 20px auto;
 }
 
 figcaption {
+  color:grey;
   font-size: $small-font-size;
+  font-style: italic;
+  text-align: center;
+  margin-top: 10px;
 }
 
 
