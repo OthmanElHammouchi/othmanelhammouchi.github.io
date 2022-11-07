@@ -44,6 +44,13 @@ $$
 
 turning our original variational problem into a system of PDEs.
 
+<figure>
+	<div class="multi-image">
+		<img src="/assets/img/perturbation.png">
+	</div>
+	<figcaption>A path $\boldsymbol{q}$ together with its perturbation by $\delta \boldsymbol{q}$</figcaption>
+</figure>
+
 In attempting to apply this method to (1), the main obstacle we face is the presence of the term $\mathcal{H}^1(K)$, which cannot be absorbed into a Lagrangian. Once again, however, physics comes to our rescue. Specifically, we will address this issue by borrowing ideas which have their origin in the study of *phase seperation*. 
 
 Suppose we are given a container $\Omega$ holding two immiscible fluids, such as oil and water, and we are interested in their final configuration at equilibrium. In order to distinguish between these phases, we arbitrarily fix one of them and introduce a so-called order parameter $u: \Omega  \rightarrow [0, 1]$ indicating the strength of its presence, with 0 meaning complete abscence and 1 total purity. The classical theory of phase transition then states that the fluids will arrange themselves so as to minimise the length of their interface, which is given by the Hausdorff measure $\mathcal{H}^1(S_u)$ of the discontinuity set of $u$. Implicit in this point of view is the assumption that this transition occurs instantly, i.e. $u$ is an indicator function taking values in $\{0, 1 \}$. 
