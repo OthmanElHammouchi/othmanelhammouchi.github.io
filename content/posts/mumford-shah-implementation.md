@@ -1,8 +1,15 @@
----
-layout: post
-title:  "Mumford-Shah Image Segmentation - Implementing the Algorithm"
-date:   2022-08-14 16:43:55 +0200
----
++++ 
+draft = false
+date = 2022-08-14T16:43:54+02:00
+title = "Implementing the Algorithm"
+description = ""
+slug = ""
+authors = []
+tags = ["image processing", "Python"]
+categories = []
+externalLink = ""
+series = ["Mumford-Shah Image Segmentation"]
++++
 
 *This is the final article in my series on variational image segmentation with the Mumford-Shah functional. The previous parts can be found [here]({{< ref "mumford-shah-intro" >}}) and [here]({{< ref "mumford-shah-equations" >}}).*
 

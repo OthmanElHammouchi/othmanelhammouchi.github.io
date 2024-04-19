@@ -1,8 +1,15 @@
----
-layout: post
-title:  "Mumford-Shah Image Segmentation - Introduction"
-date:   2022-08-14 16:43:53 +0200
----
++++ 
+draft = false
+date = 2022-08-14T16:43:53+02:00
+title = "Introduction"
+description = ""
+slug = ""
+authors = []
+tags = ["image processing", "Python"]
+categories = []
+externalLink = ""
+series = ["Mumford-Shah Image Segmentation"]
++++
 
 *This is the first in a series of articles about the Mumford-Shah model for variational image segmentation.*
 

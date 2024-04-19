@@ -6,7 +6,7 @@ aliases = ["about-us", "contact"]
 author = "Othman El Hammouchi" 
 +++
 
-Hello there! My name is Othman. I'm a mathematician, data scientist and quant developer living in Belgium. I love using models and data to generate insights and value for the digital age.
+Hello there! My name is Othman. I'm a mathematician, data scientist and quant developer living in Belgium. I love using models and data to generate insights and value for our digital age.
 
 I have a lot of experience working with the ecosystem of statistical and machine learning packages available in R and Python. I also know how to use lower level languages such as C/C++ and Fortran to implement numerically intensive calculations from scratch and provide them with programmatic frontends in the aforementioned scripting languages and/or a GUI. This can be necessary in cases where the existence of legacy models, regulatory constraints or bespoke model requirements prevent the use of off-the-shelf components. 
 

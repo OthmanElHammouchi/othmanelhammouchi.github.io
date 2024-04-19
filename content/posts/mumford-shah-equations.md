@@ -1,8 +1,15 @@
----
-layout: post
-title:  "Mumford-Shah Image Segmentation - Deriving the Equations"
-date:   2022-08-14 16:43:54 +0200
----
++++ 
+draft = false
+date = 2022-08-14T16:43:54+02:00
+title = "Deriving the Equations"
+description = ""
+slug = ""
+authors = []
+tags = ["image processing", "Python"]
+categories = []
+externalLink = ""
+series = ["Mumford-Shah Image Segmentation"]
++++
 
 *This is the second entry in my series on variational image segmentation with the Mumford-Shah functional. The previous article can be found [here]("/_posts/2022-08-14-mumford-shah-intro").*
 
