@@ -1,36 +1,23 @@
 +++ 
 draft = false
 date = 2022-08-14T16:43:53+02:00
-title = "Introduction"
+title = "Image Segmentation using the Mumford-Shah functional"
 description = ""
 slug = ""
-authors = []
+authors = ["Othman El Hammouchi"]
 tags = ["image processing", "Python"]
 categories = []
 externalLink = ""
 series = ["Mumford-Shah Image Segmentation"]
 +++
 
-*This is the first in a series of articles about the Mumford-Shah model for variational image segmentation.*
-
 Segmentation is the process of partitioning an image into a set of regions representing different surfaces and determining the contours which seperate them. This results in a simplified representation (often called a cartoon) which can then be used in all manner of downstream tasks, from medical imaging tools for assisting physicians to computer vision models. The power of image segmentation (as with all data science applications) lies in its ability to condense information, reducing a high-dimensional input with lots of superfluous detail to a streamlined representation which can be more easily parsed and processed. Every segmentation model is fundamentally defined by how it chooses to make this tradeoff between accuracy and parsimony. 
 
-In this series of posts, we'll take a look at the model proposed by mathematicians David Mumford and Jayant Shah in one of the most cited papers in the image processing literature. It belongs to the family of so-called variational methods, which operate by minimising an energy functional on a space of candidate solutions (don't worry, we'll elaborate on this later). A major benefit of this approach in comparison with more recent neural network-based ones is that it requires no labelled training data, which can be difficult and costly to obtain, especially in specialised fields such as medicine. To get you excited for the math (which can be fairly heavy-duty in places), here's a sneak peek at the final result:
+In this series of posts, we'll take a look at the model proposed by mathematicians David Mumford and Jayant Shah in their [widely cited paper](https://dash.harvard.edu/bitstream/handle/1/3637121/Mumford_OptimalApproxPiece.pdf?sequence=1). It belongs to the family of so-called variational methods, which operate by minimising an energy functional on a space of candidate solutions (don't worry, we'll elaborate on this later). A major benefit of this approach in comparison with more recent neural network-based ones is that it requires no labelled training data, which can be difficult and costly to obtain, especially in specialised fields such as medicine. To get you excited for the heavy-duty math, here's a sneak peek at the final result:
 
-<figure>
-	<div class="multi-image">
-		<img src="/assets/images/image.png">
-	</div>
-	<figcaption>Original image</figcaption>
-</figure>
+{{% figure src="per-enflo-goose.png" caption="Original image" alt="Per Enflo receives a goose from Staniław Mazur" width="50%" %}}
 
-<figure>
-	<div class="multi-image">
-		<img src="/assets/images/edges.png">
-		<img src="/assets/images/cartoon.png">
-	</div>
-	<figcaption>Segmentation</figcaption>
-</figure>
+{{% image-pair "Segmentation" "cartoon.png" "edges.png" %}}
 
 Looks pretty cool, huh? This segmentation of [Per Enflo's famous goose award ceremony](https://perenflo.com/math) was done using a numerical implementation of the Mumford-Shah model in Python, which we'll build up to in this and the next post.
 
@@ -73,7 +60,7 @@ $$
 
 as illustrated numerically in the following animation:
 
-<div style="display: flex; justify-content: center;">{{< include-html "dirichlet.html" >}}</div>
+{{< video "dirichlet" >}}
 
 Thus, we can conclude that $\underset{u \in \mathcal{A}}{\inf}J(u)$ = 0, but this value is never attained, because any minimiser of $J$ must have a constant derivative equal to 0, and thus cannot take on different values at the endpoints. Looking at how the shape of $u_\epsilon$ evolves, we can see that its slope becomes steeper and steeper as it concentrates around 0 in an attempt to minimise the derivative on the rest of its domain. 
 
