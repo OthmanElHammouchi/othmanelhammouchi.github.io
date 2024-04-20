@@ -1,0 +1,10 @@
+{{ $name := .Get 0 }}
+<script src="/js/plyr.js"></script>
+<script>
+    const player = new Plyr('#player');
+</script>
+<video id="player" width="100%" playsinline controls>
+    {{ range .Page.Resources.Match (printf "%s*" $name) }}
+    <source src="{{ .Name }}" type="{{ .MediaType.Type }}" />
+    {{ end }}
+</video>
