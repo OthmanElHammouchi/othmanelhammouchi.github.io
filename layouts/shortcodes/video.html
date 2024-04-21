@@ -3,7 +3,7 @@
 <script>
     const player = new Plyr('#player');
 </script>
-<video id="player" width="100%" playsinline controls>
+<video id="player" width="100%" playsinline controls autoplay>
     {{ range .Page.Resources.Match (printf "%s*" $name) }}
     <source src="{{ .Name }}" type="{{ .MediaType.Type }}" />
     {{ end }}
