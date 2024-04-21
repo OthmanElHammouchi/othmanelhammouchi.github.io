@@ -7,7 +7,7 @@
 -->
 <!-- Use MathJax 3 for faster loading -->
 {{ $js := resources.Get "js/mathjax-config.js" | minify }}
-<script src="{{ $js.RelPermalink }}"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script src="{{ $js.RelPermalink }}" defer></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" defer></script>
 
 
