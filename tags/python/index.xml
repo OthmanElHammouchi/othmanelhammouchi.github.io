@@ -6,7 +6,19 @@
     <description>Recent content in Python on Othman El Hammouchi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 14 Aug 2022 16:43:54 +0200</lastBuildDate><atom:link href="https://othmanelhammouchi.com/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 21 Apr 2024 16:51:00 +0200</lastBuildDate><atom:link href="https://othmanelhammouchi.com/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Encore: segmenting colour images with Mumford-Shah</title>
+      <link>https://othmanelhammouchi.com/posts/mumford-shah-colour/</link>
+      <pubDate>Sun, 21 Apr 2024 16:51:00 +0200</pubDate>
+      
+      <guid>https://othmanelhammouchi.com/posts/mumford-shah-colour/</guid>
+      <description>I wanted to write a final post in my series on Mumford-Shah segmentation to explain how the approach we detailed so far could be extended for colour images. This time, our working example will be this charming picture of Paul Erdős with child prodigy Terrence Tao:
+Mathematics transcending age barriers
+In this case, both our image and cartoon will have three components (one for each primary colour),
+$$ \begin{cases} \boldsymbol{g} = (g_1, g_2, g_3) \\[2em] \boldsymbol{u} = (u_1, u_2, u_3) \end{cases} $$</description>
+    </item>
+    
     <item>
       <title>Mumford Shah Segmentation: Implementing the Algorithm</title>
       <link>https://othmanelhammouchi.com/posts/mumford-shah-implementation/</link>
