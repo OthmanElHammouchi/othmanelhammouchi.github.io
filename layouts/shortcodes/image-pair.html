@@ -1,7 +1,7 @@
 <figure>
 	<div class="multi-image">
-		<img src="{{ .Get 1 }}">
-		<img src="{{ .Get 2 }}">
+		<img src="{{ .Get "first" }}", width="40%">
+		<img src="{{ .Get "second" }}", width="40%">
 	</div>
-    <figcaption><p>{{ .Get 0 }}</p></figcaption>
+    <figcaption><p>{{ .Get "caption" }}</p></figcaption>
 </figure>
