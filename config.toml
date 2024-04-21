@@ -36,7 +36,7 @@ enableEmoji = true
   # Right To Left, shift content direction for languagues such as Arabic
   rtl = false
 
-  math = true
+  math = false # disable KaTeX, we use MathJax
   colorScheme = "auto"
   hideColorSchemeToggle = false
 
@@ -50,7 +50,7 @@ enableEmoji = true
   customSCSS = []
 
   # Custom JS
-  customJS = ["js/plyr.js"]
+  customJS = ["js/plyr.js", "js/mathjax-config.js"]
 
   # Custom remote JS files
   customRemoteJS = []
