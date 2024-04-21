@@ -1,5 +1,6 @@
 {{ $name := .Get 0 }}
-<script src="/js/plyr.js"></script>
+{{ $js := resources.Get "js/plyr.js" | minify }}
+<script src="{{ $js.RelPermalink }}"></script>
 <script>
     const player = new Plyr('#player');
 </script>
