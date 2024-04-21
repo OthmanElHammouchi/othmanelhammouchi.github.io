@@ -20,7 +20,9 @@ $$
 where
 
 $$
+\begin{equation} \label{eq:ms-functional}
 J[u, K] = \int_{\Omega}(u - g)^2 \\, dx + \int_{\Omega \setminus K}\left \Vert \nabla u \right \Vert ^2 \\, dx + \mathcal{H}^1(K)
+\end{equation}
 $$
 
 is the Mumford-Shah functional and
@@ -49,14 +51,9 @@ $$
 
 turning our original variational problem into a system of PDEs.
 
-<figure>
-	<div class="multi-image">
-		<img src="/assets/images/perturbation.png">
-	</div>
-	<figcaption>A path $\boldsymbol{q}$ together with its perturbation by $\delta \boldsymbol{q}$</figcaption>
-</figure>
+{{< video perturbation >}}
 
-In attempting to apply this method to (1), the main obstacle we face is the presence of the term $\mathcal{H}^1(K)$, which cannot be absorbed into a Lagrangian. Once again, however, physics comes to our rescue. Specifically, we will address this issue by borrowing ideas which have their origin in the study of *phase seperation*. 
+In attempting to apply this method to equation \ref{eq:ms-functional}, the main obstacle we face is the presence of the term $\mathcal{H}^1(K)$, which cannot be absorbed into a Lagrangian. Once again, however, physics comes to our rescue. Specifically, we will address this issue by borrowing ideas which have their origin in the study of *phase seperation*. 
 
 Suppose we are given a container $\Omega$ holding two immiscible fluids, such as oil and water, and we are interested in their final configuration at equilibrium. In order to distinguish between these phases, we arbitrarily fix one of them and introduce a so-called order parameter $u: \Omega  \rightarrow [0, 1]$ indicating the strength of its presence, with 0 meaning complete abscence and 1 total purity. The classical theory of phase transition then states that the fluids will arrange themselves so as to minimise the length of their interface, which is given by the Hausdorff measure $\mathcal{H}^1(S_u)$ of the discontinuity set of $u$. Implicit in this point of view is the assumption that this transition occurs instantly, i.e. $u$ is an indicator function taking values in $\{0, 1 \}$. 
 
@@ -97,11 +94,11 @@ We differentiate with respect to $u$ to obtain
 $$
 \begin{cases} 
 	\displaystyle
-	\frac{\partial \mathcal{L}}{\partial u} = 2(u - g) \\
+	\frac{\partial \mathcal{L}}{\partial u} = 2(u - g) \\\\[1em]
 	\displaystyle
-	\frac{\partial \mathcal{L}}{\partial u_x} = 2v^2u_x \\
+	\frac{\partial \mathcal{L}}{\partial u_x} = 2v^2u_x \\\\[1em]
 	\displaystyle
-	\frac{\partial \mathcal{L}}{\partial u_y} = 2v^2u_y \\ 
+	\frac{\partial \mathcal{L}}{\partial u_y} = 2v^2u_y \\\\[1em] 
 	\frac{\partial}{\partial x}\frac{\partial \mathcal{L}}{\partial u_x} + \frac{\partial }{\partial x}\frac{\partial \mathcal{L}}{\partial u_y} = \left( \frac{\partial}{\partial x}, \frac{\partial}{\partial x}\right) \cdot \left( 2v^2u_x, 2v^2u_y \right) \\,,
 \end{cases}
 $$
@@ -117,9 +114,9 @@ Similarly, differentiating with respect to $v$ yields
 $$
 \begin{cases} 
 	\displaystyle
-	\frac{\partial \mathcal{L}}{\partial v} = 2v \Vert \nabla u \Vert^2 \\
+	\frac{\partial \mathcal{L}}{\partial v} = 2v \Vert \nabla u \Vert^2 \\\\[1em]
 	\displaystyle
-	\frac{d}{dx}\frac{\partial \mathcal{L}}{\partial v_x} = \frac{d}{dx}(2\epsilon v_x) = 2\epsilon v_{xx} \\
+	\frac{d}{dx}\frac{\partial \mathcal{L}}{\partial v_x} = \frac{d}{dx}(2\epsilon v_x) = 2\epsilon v_{xx} \\\\[1em]
 	\displaystyle
 	\frac{d}{dy}\frac{\partial \mathcal{L}}{\partial v_y} = \frac{d}{dy}(2\epsilon v_y) = 2\epsilon v_{yy} \\,,
 \end{cases}
@@ -136,15 +133,15 @@ Putting these together, we finally arrive at the system
 $$
 \begin{cases}
 	\displaystyle
-	(u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\
+	(u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\\\[1em]
 	\displaystyle
 	v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \\,,
 \end{cases}
 $$
 
-which is simply a pair of PDEs.
+which is simply a pair of PDEs. 
 
-In the next article, we will see how to implement a numerical scheme to obtain a solution to these equations.
+In the next post, we will implement a numerical scheme to solve these equations.
 
 
 

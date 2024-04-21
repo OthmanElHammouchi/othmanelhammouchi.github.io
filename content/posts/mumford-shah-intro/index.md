@@ -17,7 +17,7 @@ In this series of posts, we'll take a look at the model proposed by mathematicia
 
 {{% figure src="per-enflo-goose.png" caption="Original image" alt="Per Enflo receives a goose from Staniław Mazur" width="50%" %}}
 
-{{% image-pair "Segmentation" "cartoon.png" "edges.png" %}}
+{{% image-pair caption="Segmentation" first="cartoon.png" second="edges.png" %}}
 
 Looks pretty cool, huh? This segmentation of [Per Enflo's famous goose award ceremony](https://perenflo.com/math) was done using a numerical implementation of the Mumford-Shah model in Python, which we'll build up to in this and the next post.
 
@@ -38,7 +38,7 @@ $$
 The term "functional" is simply a fancy name given to a function which takes other functions as inputs. The Riemann integral from elementary calculus is an example of a functional: it maps functions $f \in C([a, b])$ to the real number $\int_a^b f(x) \\, dx$. Finding minimisers of functionals is well-established problem within mathematics and is 
 the subject of a field called *variational calculus* (the reason for this naming will become clear in the next post). 
 
-Of course, we have yet to show the actual existence of a minimising pair for the Mumford-Shah functional, without which our segmentation definition would be entirely vacuous. This turns out to be a rather hard problem, requiring a lot of involved mathematical machinery to tackle. If you're interested in the technical details, they were the subject of my undergraduate thesis, which you can find [here]({{ site.url }}/assets/mumford_shah_thesis.pdf) if you're feeling adventurous. 
+Of course, we have yet to show the actual existence of a minimising pair for the Mumford-Shah functional, without which our segmentation definition would be entirely vacuous. This turns out to be a rather hard problem, requiring a lot of involved mathematical machinery to tackle. If you're interested in the technical details, they were the subject of my undergraduate thesis, which you can find [here](/documents/mumford-shah-thesis.pdf) if you're feeling adventurous. 
 
 The topic is not just of theoretical interest either: if you want to maintain your sanity when writing a software implementation of this algorithm, it's quite helpful to know that your solver's failure to convergence is caused by a bug, and not because it's searching for something which doesn't exist. A famous example of a functional without minimiser is due to Weierstrass:
 
