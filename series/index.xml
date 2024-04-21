@@ -1,1 +1,20 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Series on Othman El Hammouchi</title><link>https://othmanelhammouchi.com/series/</link><description>Recent content in Series on Othman El Hammouchi</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 14 Aug 2022 16:43:54 +0200</lastBuildDate><atom:link href="https://othmanelhammouchi.com/series/index.xml" rel="self" type="application/rss+xml"/><item><title>Mumford-Shah Image Segmentation</title><link>https://othmanelhammouchi.com/series/mumford-shah-image-segmentation/</link><pubDate>Sun, 14 Aug 2022 16:43:54 +0200</pubDate><guid>https://othmanelhammouchi.com/series/mumford-shah-image-segmentation/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Series on Othman El Hammouchi</title>
+    <link>https://othmanelhammouchi.com/series/</link>
+    <description>Recent content in Series on Othman El Hammouchi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 14 Aug 2022 16:43:54 +0200</lastBuildDate><atom:link href="https://othmanelhammouchi.com/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mumford-Shah Image Segmentation</title>
+      <link>https://othmanelhammouchi.com/series/mumford-shah-image-segmentation/</link>
+      <pubDate>Sun, 14 Aug 2022 16:43:54 +0200</pubDate>
+      
+      <guid>https://othmanelhammouchi.com/series/mumford-shah-image-segmentation/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

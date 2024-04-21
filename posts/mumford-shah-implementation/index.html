@@ -1,150 +1,479 @@
-<!doctype html><html lang=en><head><title>Mumford Shah Segmentation: Implementing the Algorithm · Othman El Hammouchi</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=color-scheme content="light dark"><meta name=author content="Othman El Hammouchi"><meta name=description content="In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
-$$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em] \displaystyle v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \end{cases} $$"><meta name=keywords content="blog,developer,data science,personal"><meta name=twitter:card content="summary"><meta name=twitter:title content="Mumford Shah Segmentation: Implementing the Algorithm"><meta name=twitter:description content="In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
-$$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em] \displaystyle v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \end{cases} $$"><meta property="og:title" content="Mumford Shah Segmentation: Implementing the Algorithm"><meta property="og:description" content="In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
-$$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em] \displaystyle v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \end{cases} $$"><meta property="og:type" content="article"><meta property="og:url" content="https://othmanelhammouchi.com/posts/mumford-shah-implementation/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-08-14T16:43:54+02:00"><meta property="article:modified_time" content="2022-08-14T16:43:54+02:00"><meta property="og:see_also" content="https://othmanelhammouchi.com/posts/mumford-shah-equations/"><meta property="og:see_also" content="https://othmanelhammouchi.com/posts/mumford-shah-intro/"><link rel=canonical href=https://othmanelhammouchi.com/posts/mumford-shah-implementation/><link rel=preload href=/fonts/fa-brands-400.woff2 as=font type=font/woff2 crossorigin><link rel=preload href=/fonts/fa-regular-400.woff2 as=font type=font/woff2 crossorigin><link rel=preload href=/fonts/fa-solid-900.woff2 as=font type=font/woff2 crossorigin><link rel=stylesheet href=/css/coder.min.38c4552ac40f9ae3408bad40358f654ebd8804412fe74ed56f2d6c8a7af82dd3.css integrity="sha256-OMRVKsQPmuNAi61ANY9lTr2IBEEv507Vby1sinr4LdM=" crossorigin=anonymous media=screen><link rel=stylesheet href=/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin=anonymous media=screen><link rel=icon type=image/svg+xml href=/images/favicon.svg sizes=any><link rel=icon type=image/png href=/images/favicon-32.png sizes=32x32><link rel=icon type=image/png href=/images/favicon-16.png sizes=16x16><link rel=apple-touch-icon href=/images/apple-touch-icon.png><link rel=apple-touch-icon sizes=180x180 href=/images/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/images/safari-pinned-tab.svg color=#5bbad5><script src=/js/mathjax-config.min.js></script>
-<script type=text/javascript src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js></script></head><body class="preload-transitions colorscheme-auto"><div class=float-container><a id=dark-mode-toggle class=colorscheme-toggle><i class="fa-solid fa-adjust fa-fw" aria-hidden=true></i></a></div><main class=wrapper><nav class=navigation><section class=container><a class=navigation-title href=https://othmanelhammouchi.com/>Othman El Hammouchi</a>
-<input type=checkbox id=menu-toggle>
-<label class="menu-button float-right" for=menu-toggle><i class="fa-solid fa-bars fa-fw" aria-hidden=true></i></label><ul class=navigation-list><li class=navigation-item><a class=navigation-link href=/about/>About</a></li><li class=navigation-item><a class=navigation-link href=/posts/>Blog</a></li><li class=navigation-item><a class=navigation-link href=/contact/>Contact me</a></li></ul></section></nav><div class=content><section class="container post"><article><header><div class=post-title><h1 class=title><a class=title-link href=https://othmanelhammouchi.com/posts/mumford-shah-implementation/>Mumford Shah Segmentation: Implementing the Algorithm</a></h1></div><div class=post-meta><div class=date><span class=posted-on><i class="fa-solid fa-calendar" aria-hidden=true></i>
-<time datetime=2022-08-14T16:43:54+02:00>August 14, 2022</time></span>
-<span class=reading-time><i class="fa-solid fa-clock" aria-hidden=true></i>
-6-minute read</span></div><div class=authors><i class="fa-solid fa-user" aria-hidden=true></i>
-<a href=/authors/othman-el-hammouchi/>Othman El Hammouchi</a></div><div class=tags><i class="fa-solid fa-tag" aria-hidden=true></i>
-<span class=tag><a href=/tags/image-processing/>image processing</a></span>
-<span class=separator>•</span>
-<span class=tag><a href=/tags/python/>Python</a></span></div></div></header><div class=post-content><p>In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs</p><p>$$
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Mumford Shah Segmentation: Implementing the Algorithm · Othman El Hammouchi
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Othman El Hammouchi">
+<meta name="description" content="In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
+$$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em] \displaystyle v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \end{cases} $$">
+<meta name="keywords" content="blog,developer,data science,personal">
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Mumford Shah Segmentation: Implementing the Algorithm"/>
+<meta name="twitter:description" content="In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
+$$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em] \displaystyle v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \end{cases} $$"/>
+
+<meta property="og:title" content="Mumford Shah Segmentation: Implementing the Algorithm" />
+<meta property="og:description" content="In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs
+$$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em] \displaystyle v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0 \end{cases} $$" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://othmanelhammouchi.com/posts/mumford-shah-implementation/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-14T16:43:54+02:00" />
+<meta property="article:modified_time" content="2022-08-14T16:43:54+02:00" />
+<meta property="og:see_also" content="https://othmanelhammouchi.com/posts/mumford-shah-equations/" /><meta property="og:see_also" content="https://othmanelhammouchi.com/posts/mumford-shah-intro/" />
+
+
+
+
+
+<link rel="canonical" href="https://othmanelhammouchi.com/posts/mumford-shah-implementation/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.38c4552ac40f9ae3408bad40358f654ebd8804412fe74ed56f2d6c8a7af82dd3.css" integrity="sha256-OMRVKsQPmuNAi61ANY9lTr2IBEEv507Vby1sinr4LdM=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+<script src="/js/mathjax-config.min.js" defer></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" defer></script>
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://othmanelhammouchi.com/">
+      Othman El Hammouchi
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/contact/">Contact me</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://othmanelhammouchi.com/posts/mumford-shah-implementation/">
+              Mumford Shah Segmentation: Implementing the Algorithm
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2022-08-14T16:43:54&#43;02:00">
+                August 14, 2022
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              6-minute read
+            </span>
+          </div>
+          <div class="authors">
+  <i class="fa-solid fa-user" aria-hidden="true"></i>
+    <a href="/authors/othman-el-hammouchi/">Othman El Hammouchi</a></div>
+
+          
+          <div class="tags">
+  <i class="fa-solid fa-tag" aria-hidden="true"></i>
+    <span class="tag">
+      <a href="/tags/image-processing/">image processing</a>
+    </span>
+      <span class="separator">•</span>
+    <span class="tag">
+      <a href="/tags/python/">Python</a>
+    </span></div>
+
+        </div>
+      </header>
+
+      <div class="post-content">
+        
+        <p>In the previous article, we discussed the challenges with the numerical implementation of the Mumford-Shah functional and defined a series of approximations which allow us to overcome them. This allowed us in turn to derive the Euler-Lagrange PDEs</p>
+<p>$$
 \begin{cases}
 \displaystyle
 (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em]
 \displaystyle
 v \Vert \nabla u \Vert^2 - \frac{1 - v}{4\epsilon} - \epsilon \Delta v = 0
 \end{cases}
-$$</p><p>which we can solve to obtain a pair of approximations $(u_\epsilon, v_\epsilon)$. We have seen that as $\epsilon \to 0$, the corresponding approximations converge to $(u, I_K)$. All that remains for us, then, is to code this up. We&rsquo;ll use the Python bindings for the <a href=https://fenicsproject.org/ class=external-link target=_blank rel=noopener>FEniCS</a> finite element library, as it allows us to specify the equations using its so-called <em>Unified Form Language</em> in a manner which is very close to the original mathematics.</p><p>In order to apply the finite element method, we first have to put our PDE into a different form called the <em>weak formulation</em>. This is achieved by multiplying both sides by a so-called <em>test function</em> and integrating on the domain:</p><p>$$
+$$</p>
+<p>which we can solve to obtain a pair of approximations $(u_\epsilon, v_\epsilon)$. We have seen that as $\epsilon \to 0$, the corresponding approximations converge to $(u, I_K)$. All that remains for us, then, is to code this up. We&rsquo;ll use the Python bindings for the <a href="https://fenicsproject.org/"  class="external-link" target="_blank" rel="noopener">FEniCS</a> finite element library, as it allows us to specify the equations using its so-called <em>Unified Form Language</em> in a manner which is very close to the original mathematics.</p>
+<p>In order to apply the finite element method, we first have to put our PDE into a different form called the <em>weak formulation</em>. This is achieved by multiplying both sides by a so-called <em>test function</em> and integrating on the domain:</p>
+<p>$$
 \begin{cases}
 \displaystyle
 \int_\Omega (u - g) \, w \, dx - \int_\Omega w \, \nabla \cdot (v^2 \nabla u) \, dx = 0 \\[2em]
 \displaystyle
 \int_\Omega w \, v \Vert \nabla u \Vert^2 \, dx + \frac{1}{4\epsilon}\int_\Omega w v\, dx - \int_\Omega \epsilon \Delta v \, w\, dx = \frac{1}{4\epsilon} \int_\Omega w \, dx \,.
 \end{cases}
-$$</p><p>Then we integrate by parts to reduce by 1 the order of the highest derivative:</p><p>$$
+$$</p>
+<p>Then we integrate by parts to reduce by 1 the order of the highest derivative:</p>
+<p>$$
 \left\{
 \begin{align}
-\int_\Omega (u - g) \, w \, dx - \int_\Omega v^2 \, \nabla w \cdot \nabla u \, dx &= 0 \label{eq:cartoon} \\[2em]
-\int_\Omega w \, v \Vert \nabla u \Vert^2 \, dx + \int_\Omega \frac{w \, v}{4\epsilon} \, dx - \int_\Omega \epsilon \nabla v \cdot \nabla w \, dx &= \int_\Omega \frac{w}{4\epsilon} \, dx \label{eq:edges} \,.
+\int_\Omega (u - g) \, w \, dx - \int_\Omega v^2 \, \nabla w \cdot \nabla u \, dx &amp;= 0 \label{eq:cartoon} \\[2em]
+\int_\Omega w \, v \Vert \nabla u \Vert^2 \, dx + \int_\Omega \frac{w \, v}{4\epsilon} \, dx - \int_\Omega \epsilon \nabla v \cdot \nabla w \, dx &amp;= \int_\Omega \frac{w}{4\epsilon} \, dx \label{eq:edges} \,.
 \end{align}
 \right.
-$$</p><p>Now let&rsquo;s get started on the implementation (all of the code for this series is available on <a href=https://github.com/OthmanElHammouchi/mumford-shah class=external-link target=_blank rel=noopener>my github</a>). First, we&rsquo;ll import the image from the <a href=https://othmanelhammouchi.com/posts/mumford-shah-intro/>introduction</a> using OpenCV, which will give us a <code>numpy</code> array with the pixel values. We then compute width and height values for our mesh such that the image is resized to have unit height.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>image <span style=color:#f92672>=</span> cv2<span style=color:#f92672>.</span>imread(os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(<span style=color:#e6db74>&#34;data&#34;</span>, <span style=color:#e6db74>&#34;image&#34;</span>, <span style=color:#e6db74>&#34;per-enflo-goose.png&#34;</span>))
-</span></span><span style=display:flex><span>Lx <span style=color:#f92672>=</span> float(image<span style=color:#f92672>.</span>shape[<span style=color:#ae81ff>1</span>]) <span style=color:#f92672>/</span> float(image<span style=color:#f92672>.</span>shape[<span style=color:#ae81ff>0</span>])
-</span></span><span style=display:flex><span>Ly <span style=color:#f92672>=</span> <span style=color:#ae81ff>1.0</span>
-</span></span><span style=display:flex><span>hx <span style=color:#f92672>=</span> Lx <span style=color:#f92672>/</span> float(image<span style=color:#f92672>.</span>shape[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>)
-</span></span><span style=display:flex><span>hy <span style=color:#f92672>=</span> Ly <span style=color:#f92672>/</span> float(image<span style=color:#f92672>.</span>shape[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>)</span></span></code></pre></div><p>Next, we&rsquo;ll create a rectangular mesh domain, which represents $\Omega$ in our equations.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>ELEMS <span style=color:#f92672>=</span> <span style=color:#ae81ff>500</span>  <span style=color:#75715e># per unit of length</span>
-</span></span><span style=display:flex><span>domain <span style=color:#f92672>=</span> mesh<span style=color:#f92672>.</span>create_rectangle(
-</span></span><span style=display:flex><span>    MPI<span style=color:#f92672>.</span>COMM_WORLD,
-</span></span><span style=display:flex><span>    [[<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>], [Lx, Ly]],
-</span></span><span style=display:flex><span>    [int(math<span style=color:#f92672>.</span>floor(Lx <span style=color:#f92672>*</span> ELEMS)), int(math<span style=color:#f92672>.</span>floor(Ly <span style=color:#f92672>*</span> ELEMS))],
-</span></span><span style=display:flex><span>)</span></span></code></pre></div><p>To actually get the image onto the mesh, we need to define a <code>FunctionSpace</code>, create a function <code>g</code>, and <code>interpolate</code> the image into this. The helper function <code>image_fun</code> maps the points $(x, y)$ in $\Omega$ to the corresponding point in the image array. Notice that we need to reverse the indices, as a row of the image array will give the values at a particular y-value of the domain.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>image_fun</span>(x):
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>global</span> hx, hy
-</span></span><span style=display:flex><span>    res <span style=color:#f92672>=</span> np<span style=color:#f92672>.</span>zeros((<span style=color:#ae81ff>3</span>, x<span style=color:#f92672>.</span>shape[<span style=color:#ae81ff>1</span>]))
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> k <span style=color:#f92672>in</span> range(x<span style=color:#f92672>.</span>shape[<span style=color:#ae81ff>1</span>]):
-</span></span><span style=display:flex><span>        j <span style=color:#f92672>=</span> int(math<span style=color:#f92672>.</span>floor(x[<span style=color:#ae81ff>0</span>, k] <span style=color:#f92672>/</span> hx))
-</span></span><span style=display:flex><span>        i <span style=color:#f92672>=</span> int(math<span style=color:#f92672>.</span>floor((Ly <span style=color:#f92672>-</span> x[<span style=color:#ae81ff>1</span>, k]) <span style=color:#f92672>/</span> hy))
-</span></span><span style=display:flex><span>        res[:, k] <span style=color:#f92672>=</span> image[i, j, :]
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> res
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>U <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>FunctionSpace(domain, (<span style=color:#e6db74>&#34;Lagrange&#34;</span>, <span style=color:#ae81ff>1</span>, (<span style=color:#ae81ff>3</span>,)))
-</span></span><span style=display:flex><span>V <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>FunctionSpace(domain, (<span style=color:#e6db74>&#34;Lagrange&#34;</span>, <span style=color:#ae81ff>1</span>))
-</span></span><span style=display:flex><span>g <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>Function(U)
-</span></span><span style=display:flex><span>g<span style=color:#f92672>.</span>interpolate(image_fun)</span></span></code></pre></div><p>Now we get to the meat of the code, solving the PDE system. In UFL, equations \ref{eq:cartoon} and \ref{eq:edges} can be written represented as</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>    a <span style=color:#f92672>=</span> (
-</span></span><span style=display:flex><span>        dot(grad(u), grad(u)) <span style=color:#f92672>*</span> v <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>        <span style=color:#f92672>-</span> eps <span style=color:#f92672>*</span> dot(grad(v), grad(w)) <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>        <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>/</span> (<span style=color:#ae81ff>4</span> <span style=color:#f92672>*</span> eps) <span style=color:#f92672>*</span> v <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>    L <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>Constant(domain, <span style=color:#ae81ff>1</span> <span style=color:#f92672>/</span> (<span style=color:#ae81ff>4</span> <span style=color:#f92672>*</span> eps)) <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx</span></span></code></pre></div><p>and</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>    L <span style=color:#f92672>=</span> g <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>    a <span style=color:#f92672>=</span> u <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx <span style=color:#f92672>+</span> (v<span style=color:#f92672>**</span><span style=color:#ae81ff>2</span>) <span style=color:#f92672>*</span> dot(grad(u), grad(w)) <span style=color:#f92672>*</span> dx</span></span></code></pre></div><p>respectively. We will solve the system by iteratively alternating between the two equations: taking $u = g$ as our starting point, we will solve each one in turn while fixing the other variable to the previous solution we obtained. Let&rsquo;s write a pair of helper functions to define and solve these subproblems:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>grayscale_edges</span>(u, eps, V):
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>global</span> domain
-</span></span><span style=display:flex><span>    v <span style=color:#f92672>=</span> TrialFunction(V)
-</span></span><span style=display:flex><span>    w <span style=color:#f92672>=</span> TestFunction(V)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    a <span style=color:#f92672>=</span> (
-</span></span><span style=display:flex><span>        dot(grad(u), grad(u)) <span style=color:#f92672>*</span> v <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>        <span style=color:#f92672>-</span> eps <span style=color:#f92672>*</span> dot(grad(v), grad(w)) <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>        <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>/</span> (<span style=color:#ae81ff>4</span> <span style=color:#f92672>*</span> eps) <span style=color:#f92672>*</span> v <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>    L <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>Constant(domain, <span style=color:#ae81ff>1</span> <span style=color:#f92672>/</span> (<span style=color:#ae81ff>4</span> <span style=color:#f92672>*</span> eps)) <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    v <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>Function(V)
-</span></span><span style=display:flex><span>    problem <span style=color:#f92672>=</span> LinearProblem(
-</span></span><span style=display:flex><span>        a, L, petsc_options<span style=color:#f92672>=</span>{<span style=color:#e6db74>&#34;ksp_type&#34;</span>: <span style=color:#e6db74>&#34;preonly&#34;</span>, <span style=color:#e6db74>&#34;pc_type&#34;</span>: <span style=color:#e6db74>&#34;lu&#34;</span>}
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>    vh <span style=color:#f92672>=</span> problem<span style=color:#f92672>.</span>solve()
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> vh
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>grayscale_cartoon</span>(v, g, V):
-</span></span><span style=display:flex><span>    u <span style=color:#f92672>=</span> TrialFunction(V)
-</span></span><span style=display:flex><span>    w <span style=color:#f92672>=</span> TestFunction(V)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    L <span style=color:#f92672>=</span> g <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>    a <span style=color:#f92672>=</span> u <span style=color:#f92672>*</span> w <span style=color:#f92672>*</span> dx <span style=color:#f92672>+</span> (v<span style=color:#f92672>**</span><span style=color:#ae81ff>2</span>) <span style=color:#f92672>*</span> dot(grad(u), grad(w)) <span style=color:#f92672>*</span> dx
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    u <span style=color:#f92672>=</span> fem<span style=color:#f92672>.</span>Function(V)
-</span></span><span style=display:flex><span>    problem <span style=color:#f92672>=</span> LinearProblem(
-</span></span><span style=display:flex><span>        a, L, petsc_options<span style=color:#f92672>=</span>{<span style=color:#e6db74>&#34;ksp_type&#34;</span>: <span style=color:#e6db74>&#34;preonly&#34;</span>, <span style=color:#e6db74>&#34;pc_type&#34;</span>: <span style=color:#e6db74>&#34;lu&#34;</span>}
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>    uh <span style=color:#f92672>=</span> problem<span style=color:#f92672>.</span>solve()
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> uh</span></span></code></pre></div><p>The segmentation can now be implemented in a while loop:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>segment_image</span>(g, V, eps, maxiter<span style=color:#f92672>=</span><span style=color:#ae81ff>5</span>):
-</span></span><span style=display:flex><span>    u <span style=color:#f92672>=</span> g
-</span></span><span style=display:flex><span>    iter <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> iter <span style=color:#f92672>&lt;=</span> maxiter:
-</span></span><span style=display:flex><span>        v <span style=color:#f92672>=</span> grayscale_edges(u, eps, V)
-</span></span><span style=display:flex><span>        u <span style=color:#f92672>=</span> grayscale_cartoon(v, g, V)
-</span></span><span style=display:flex><span>        iter <span style=color:#f92672>+=</span> <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> u, v</span></span></code></pre></div><p>In order to extract the segmentation images from the solution, we unfortunately have to do some very inelegant gymnastics. This is owing to the newer versions of FEniCS having removed the utility functions for evaluating the function at the mesh nodes &ndash; an earlier version of this code extracted the data with a simple oneliner. Unfortunately, this is one of the big shortcomings of the framework: it has a very unstable API which gets breaking changes quite frequently, and the documentation is very succint. I don&rsquo;t want to criticise it too harshly though, it&rsquo;s still volunteer-based FOSS.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>points <span style=color:#f92672>=</span> domain<span style=color:#f92672>.</span>geometry<span style=color:#f92672>.</span>x
-</span></span><span style=display:flex><span>points <span style=color:#f92672>=</span> points[
-</span></span><span style=display:flex><span>    np<span style=color:#f92672>.</span>lexsort(
-</span></span><span style=display:flex><span>        (points[:, <span style=color:#ae81ff>0</span>], <span style=color:#f92672>-</span>points[:, <span style=color:#ae81ff>1</span>])
-</span></span><span style=display:flex><span>    )  <span style=color:#75715e># Ensures correct orientation for plt.imshow</span>
-</span></span><span style=display:flex><span>]
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>bb_tree <span style=color:#f92672>=</span> geometry<span style=color:#f92672>.</span>bb_tree(domain, domain<span style=color:#f92672>.</span>topology<span style=color:#f92672>.</span>dim)
-</span></span><span style=display:flex><span>cell_candidates <span style=color:#f92672>=</span> geometry<span style=color:#f92672>.</span>compute_collisions_points(bb_tree, points)
-</span></span><span style=display:flex><span>colliding_cells <span style=color:#f92672>=</span> geometry<span style=color:#f92672>.</span>compute_colliding_cells(domain, cell_candidates, points)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>cells <span style=color:#f92672>=</span> []
-</span></span><span style=display:flex><span>points_on_proc <span style=color:#f92672>=</span> []
-</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i, point <span style=color:#f92672>in</span> enumerate(points):
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> len(colliding_cells<span style=color:#f92672>.</span>links(i)) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>:
-</span></span><span style=display:flex><span>        points_on_proc<span style=color:#f92672>.</span>append(point)
-</span></span><span style=display:flex><span>        cells<span style=color:#f92672>.</span>append(colliding_cells<span style=color:#f92672>.</span>links(i)[<span style=color:#ae81ff>0</span>])
-</span></span><span style=display:flex><span>points_on_proc <span style=color:#f92672>=</span> np<span style=color:#f92672>.</span>array(points_on_proc, dtype<span style=color:#f92672>=</span>np<span style=color:#f92672>.</span>float64)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>comps <span style=color:#f92672>=</span> list(u<span style=color:#f92672>.</span>split())
-</span></span><span style=display:flex><span>comps <span style=color:#f92672>=</span> [comp<span style=color:#f92672>.</span>eval(points_on_proc, cells)<span style=color:#f92672>.</span>reshape((ELEMS <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>, <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>)) <span style=color:#66d9ef>for</span> comp <span style=color:#f92672>in</span> comps]
-</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(len(comps)):
-</span></span><span style=display:flex><span>    comps[i] <span style=color:#f92672>=</span> np<span style=color:#f92672>.</span>abs(comps[i]<span style=color:#f92672>.</span>min()) <span style=color:#f92672>+</span> comps[i]
-</span></span><span style=display:flex><span>    comps[i] <span style=color:#f92672>=</span> <span style=color:#ae81ff>255</span> <span style=color:#f92672>*</span> comps[i] <span style=color:#f92672>/</span> comps[i]<span style=color:#f92672>.</span>max()
-</span></span><span style=display:flex><span>    comps[i] <span style=color:#f92672>=</span> comps[i]<span style=color:#f92672>.</span>astype(np<span style=color:#f92672>.</span>uint8)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>cartoon <span style=color:#f92672>=</span> np<span style=color:#f92672>.</span>stack(
-</span></span><span style=display:flex><span>    comps,
-</span></span><span style=display:flex><span>    axis<span style=color:#f92672>=-</span><span style=color:#ae81ff>1</span>,
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>edges <span style=color:#f92672>=</span> v<span style=color:#f92672>.</span>eval(points_on_proc, cells)<span style=color:#f92672>.</span>reshape((ELEMS <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>, <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>))
-</span></span><span style=display:flex><span>edges <span style=color:#f92672>=</span> np<span style=color:#f92672>.</span>abs(edges<span style=color:#f92672>.</span>min()) <span style=color:#f92672>+</span> edges
-</span></span><span style=display:flex><span>edges <span style=color:#f92672>=</span> <span style=color:#ae81ff>255</span> <span style=color:#f92672>*</span> edges <span style=color:#f92672>/</span> edges<span style=color:#f92672>.</span>max()
-</span></span><span style=display:flex><span>edges <span style=color:#f92672>=</span> edges<span style=color:#f92672>.</span>astype(np<span style=color:#f92672>.</span>uint8)</span></span></code></pre></div><p>Finally, we write out the results to disk,</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plt<span style=color:#f92672>.</span>imsave(
-</span></span><span style=display:flex><span>    os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(<span style=color:#e6db74>&#34;results&#34;</span>, <span style=color:#e6db74>&#34;colour_cartoon.png&#34;</span>),
-</span></span><span style=display:flex><span>    cv2<span style=color:#f92672>.</span>cvtColor(cartoon, cv2<span style=color:#f92672>.</span>COLOR_BGR2RGB),
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>plt<span style=color:#f92672>.</span>imsave(os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(<span style=color:#e6db74>&#34;results&#34;</span>, <span style=color:#e6db74>&#34;colour_edges.png&#34;</span>), edges, cmap<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;grey&#34;</span>)</span></span></code></pre></div><p>and gaze upon the fruits of our labour:</p><figure><div class=multi-image><img src=grayscale_cartoon.png , width=40%>
-<img src=grayscale_edges.png , width=40%></div><figcaption><p>Segmentation of the legendary picture of Per Enflo's goose award ceremony</p></figcaption></figure></div><footer><section class=see-also><h3 id=see-also-in-mumford-shah-image-segmentation>See also in Mumford-Shah Image Segmentation
-<a class=heading-link href=#see-also-in-mumford-shah-image-segmentation><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
-<span class=sr-only>Link to heading</span></a></h3><nav><ul><li><a href=/posts/mumford-shah-equations/>Mumford-Shah Segmentation: Deriving the Equations</a></li><li><a href=/posts/mumford-shah-intro/>Image Segmentation using the Mumford-Shah functional</a></li></ul></nav></section></footer></article></section></div><footer class=footer><section class=container>©
-2022 -
-2024
-Othman El Hammouchi
-·
-Powered by <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> & <a href=https://github.com/luizdepra/hugo-coder/ target=_blank rel=noopener>Coder</a>.</section></footer></main><script src=/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
-<script src=/js/plyr.min.8537ca66f236f20d383a4be510f5da50a2bd3d7c4464b11f1968461eefaf00d1.js integrity="sha256-hTfKZvI28g04OkvlEPXaUKK9PXxEZLEfGWhGHu+vANE="></script>
-<script src=/js/mathjax-config.min.3b9893c399025c9bd37a95cbd1a323be25402140dba10377bf23467199a66f7e.js integrity="sha256-O5iTw5kCXJvTepXL0aMjviVAIUDboQN3vyNGcZmmb34="></script></body></html>
+$$</p>
+<p>Now let&rsquo;s get started on the implementation (all of the code for this series is available on <a href="https://github.com/OthmanElHammouchi/mumford-shah"  class="external-link" target="_blank" rel="noopener">my github</a>). First, we&rsquo;ll import the image from the <a href="https://othmanelhammouchi.com/posts/mumford-shah-intro/" >introduction</a> using OpenCV, which will give us a <code>numpy</code> array with the pixel values. We then compute width and height values for our mesh such that the image is resized to have unit height.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>image <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>imread(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;data&#34;</span>, <span style="color:#e6db74">&#34;image&#34;</span>, <span style="color:#e6db74">&#34;per-enflo-goose.png&#34;</span>))
+</span></span><span style="display:flex;"><span>Lx <span style="color:#f92672">=</span> float(image<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">/</span> float(image<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>Ly <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span>hx <span style="color:#f92672">=</span> Lx <span style="color:#f92672">/</span> float(image<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>hy <span style="color:#f92672">=</span> Ly <span style="color:#f92672">/</span> float(image<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)</span></span></code></pre></div>
+<p>Next, we&rsquo;ll create a rectangular mesh domain, which represents $\Omega$ in our equations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ELEMS <span style="color:#f92672">=</span> <span style="color:#ae81ff">500</span>  <span style="color:#75715e"># per unit of length</span>
+</span></span><span style="display:flex;"><span>domain <span style="color:#f92672">=</span> mesh<span style="color:#f92672">.</span>create_rectangle(
+</span></span><span style="display:flex;"><span>    MPI<span style="color:#f92672">.</span>COMM_WORLD,
+</span></span><span style="display:flex;"><span>    [[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>], [Lx, Ly]],
+</span></span><span style="display:flex;"><span>    [int(math<span style="color:#f92672">.</span>floor(Lx <span style="color:#f92672">*</span> ELEMS)), int(math<span style="color:#f92672">.</span>floor(Ly <span style="color:#f92672">*</span> ELEMS))],
+</span></span><span style="display:flex;"><span>)</span></span></code></pre></div>
+<p>To actually get the image onto the mesh, we need to define a <code>FunctionSpace</code>, create a function <code>g</code>, and <code>interpolate</code> the image into this. The helper function <code>image_fun</code> maps the points $(x, y)$ in $\Omega$ to the corresponding point in the image array. Notice that we need to reverse the indices, as a row of the image array will give the values at a particular y-value of the domain.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">image_fun</span>(x):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> hx, hy
+</span></span><span style="display:flex;"><span>    res <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">3</span>, x<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>]))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> k <span style="color:#f92672">in</span> range(x<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>]):
+</span></span><span style="display:flex;"><span>        j <span style="color:#f92672">=</span> int(math<span style="color:#f92672">.</span>floor(x[<span style="color:#ae81ff">0</span>, k] <span style="color:#f92672">/</span> hx))
+</span></span><span style="display:flex;"><span>        i <span style="color:#f92672">=</span> int(math<span style="color:#f92672">.</span>floor((Ly <span style="color:#f92672">-</span> x[<span style="color:#ae81ff">1</span>, k]) <span style="color:#f92672">/</span> hy))
+</span></span><span style="display:flex;"><span>        res[:, k] <span style="color:#f92672">=</span> image[i, j, :]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> res
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>U <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>FunctionSpace(domain, (<span style="color:#e6db74">&#34;Lagrange&#34;</span>, <span style="color:#ae81ff">1</span>, (<span style="color:#ae81ff">3</span>,)))
+</span></span><span style="display:flex;"><span>V <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>FunctionSpace(domain, (<span style="color:#e6db74">&#34;Lagrange&#34;</span>, <span style="color:#ae81ff">1</span>))
+</span></span><span style="display:flex;"><span>g <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>Function(U)
+</span></span><span style="display:flex;"><span>g<span style="color:#f92672">.</span>interpolate(image_fun)</span></span></code></pre></div>
+<p>Now we get to the meat of the code, solving the PDE system. In UFL, equations \ref{eq:cartoon} and \ref{eq:edges} can be written represented as</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    a <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>        dot(grad(u), grad(u)) <span style="color:#f92672">*</span> v <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">-</span> eps <span style="color:#f92672">*</span> dot(grad(v), grad(w)) <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> eps) <span style="color:#f92672">*</span> v <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    L <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>Constant(domain, <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> eps)) <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx</span></span></code></pre></div>
+<p>and</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    L <span style="color:#f92672">=</span> g <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>    a <span style="color:#f92672">=</span> u <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx <span style="color:#f92672">+</span> (v<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">*</span> dot(grad(u), grad(w)) <span style="color:#f92672">*</span> dx</span></span></code></pre></div>
+<p>respectively. We will solve the system by iteratively alternating between the two equations: taking $u = g$ as our starting point, we will solve each one in turn while fixing the other variable to the previous solution we obtained. Let&rsquo;s write a pair of helper functions to define and solve these subproblems:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">grayscale_edges</span>(u, eps, V):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> domain
+</span></span><span style="display:flex;"><span>    v <span style="color:#f92672">=</span> TrialFunction(V)
+</span></span><span style="display:flex;"><span>    w <span style="color:#f92672">=</span> TestFunction(V)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    a <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>        dot(grad(u), grad(u)) <span style="color:#f92672">*</span> v <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">-</span> eps <span style="color:#f92672">*</span> dot(grad(v), grad(w)) <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> eps) <span style="color:#f92672">*</span> v <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    L <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>Constant(domain, <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> eps)) <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    v <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>Function(V)
+</span></span><span style="display:flex;"><span>    problem <span style="color:#f92672">=</span> LinearProblem(
+</span></span><span style="display:flex;"><span>        a, L, petsc_options<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;ksp_type&#34;</span>: <span style="color:#e6db74">&#34;preonly&#34;</span>, <span style="color:#e6db74">&#34;pc_type&#34;</span>: <span style="color:#e6db74">&#34;lu&#34;</span>}
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    vh <span style="color:#f92672">=</span> problem<span style="color:#f92672">.</span>solve()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> vh
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">grayscale_cartoon</span>(v, g, V):
+</span></span><span style="display:flex;"><span>    u <span style="color:#f92672">=</span> TrialFunction(V)
+</span></span><span style="display:flex;"><span>    w <span style="color:#f92672">=</span> TestFunction(V)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    L <span style="color:#f92672">=</span> g <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>    a <span style="color:#f92672">=</span> u <span style="color:#f92672">*</span> w <span style="color:#f92672">*</span> dx <span style="color:#f92672">+</span> (v<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">*</span> dot(grad(u), grad(w)) <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    u <span style="color:#f92672">=</span> fem<span style="color:#f92672">.</span>Function(V)
+</span></span><span style="display:flex;"><span>    problem <span style="color:#f92672">=</span> LinearProblem(
+</span></span><span style="display:flex;"><span>        a, L, petsc_options<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;ksp_type&#34;</span>: <span style="color:#e6db74">&#34;preonly&#34;</span>, <span style="color:#e6db74">&#34;pc_type&#34;</span>: <span style="color:#e6db74">&#34;lu&#34;</span>}
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    uh <span style="color:#f92672">=</span> problem<span style="color:#f92672">.</span>solve()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> uh</span></span></code></pre></div>
+<p>The segmentation can now be implemented in a while loop:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">segment_image</span>(g, V, eps, maxiter<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>    u <span style="color:#f92672">=</span> g
+</span></span><span style="display:flex;"><span>    iter <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> iter <span style="color:#f92672">&lt;=</span> maxiter:
+</span></span><span style="display:flex;"><span>        v <span style="color:#f92672">=</span> grayscale_edges(u, eps, V)
+</span></span><span style="display:flex;"><span>        u <span style="color:#f92672">=</span> grayscale_cartoon(v, g, V)
+</span></span><span style="display:flex;"><span>        iter <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> u, v</span></span></code></pre></div>
+<p>In order to extract the segmentation images from the solution, we unfortunately have to do some very inelegant gymnastics. This is owing to the newer versions of FEniCS having removed the utility functions for evaluating the function at the mesh nodes &ndash; an earlier version of this code extracted the data with a simple oneliner. Unfortunately, this is one of the big shortcomings of the framework: it has a very unstable API which gets breaking changes quite frequently, and the documentation is very succint. I don&rsquo;t want to criticise it too harshly though, it&rsquo;s still volunteer-based FOSS.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>points <span style="color:#f92672">=</span> domain<span style="color:#f92672">.</span>geometry<span style="color:#f92672">.</span>x
+</span></span><span style="display:flex;"><span>points <span style="color:#f92672">=</span> points[
+</span></span><span style="display:flex;"><span>    np<span style="color:#f92672">.</span>lexsort(
+</span></span><span style="display:flex;"><span>        (points[:, <span style="color:#ae81ff">0</span>], <span style="color:#f92672">-</span>points[:, <span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>    )  <span style="color:#75715e"># Ensures correct orientation for plt.imshow</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>bb_tree <span style="color:#f92672">=</span> geometry<span style="color:#f92672">.</span>bb_tree(domain, domain<span style="color:#f92672">.</span>topology<span style="color:#f92672">.</span>dim)
+</span></span><span style="display:flex;"><span>cell_candidates <span style="color:#f92672">=</span> geometry<span style="color:#f92672">.</span>compute_collisions_points(bb_tree, points)
+</span></span><span style="display:flex;"><span>colliding_cells <span style="color:#f92672">=</span> geometry<span style="color:#f92672">.</span>compute_colliding_cells(domain, cell_candidates, points)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cells <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>points_on_proc <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i, point <span style="color:#f92672">in</span> enumerate(points):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(colliding_cells<span style="color:#f92672">.</span>links(i)) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>        points_on_proc<span style="color:#f92672">.</span>append(point)
+</span></span><span style="display:flex;"><span>        cells<span style="color:#f92672">.</span>append(colliding_cells<span style="color:#f92672">.</span>links(i)[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>points_on_proc <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array(points_on_proc, dtype<span style="color:#f92672">=</span>np<span style="color:#f92672">.</span>float64)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>comps <span style="color:#f92672">=</span> list(u<span style="color:#f92672">.</span>split())
+</span></span><span style="display:flex;"><span>comps <span style="color:#f92672">=</span> [comp<span style="color:#f92672">.</span>eval(points_on_proc, cells)<span style="color:#f92672">.</span>reshape((ELEMS <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)) <span style="color:#66d9ef">for</span> comp <span style="color:#f92672">in</span> comps]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(comps)):
+</span></span><span style="display:flex;"><span>    comps[i] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>abs(comps[i]<span style="color:#f92672">.</span>min()) <span style="color:#f92672">+</span> comps[i]
+</span></span><span style="display:flex;"><span>    comps[i] <span style="color:#f92672">=</span> <span style="color:#ae81ff">255</span> <span style="color:#f92672">*</span> comps[i] <span style="color:#f92672">/</span> comps[i]<span style="color:#f92672">.</span>max()
+</span></span><span style="display:flex;"><span>    comps[i] <span style="color:#f92672">=</span> comps[i]<span style="color:#f92672">.</span>astype(np<span style="color:#f92672">.</span>uint8)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cartoon <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>stack(
+</span></span><span style="display:flex;"><span>    comps,
+</span></span><span style="display:flex;"><span>    axis<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>edges <span style="color:#f92672">=</span> v<span style="color:#f92672">.</span>eval(points_on_proc, cells)<span style="color:#f92672">.</span>reshape((ELEMS <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))
+</span></span><span style="display:flex;"><span>edges <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>abs(edges<span style="color:#f92672">.</span>min()) <span style="color:#f92672">+</span> edges
+</span></span><span style="display:flex;"><span>edges <span style="color:#f92672">=</span> <span style="color:#ae81ff">255</span> <span style="color:#f92672">*</span> edges <span style="color:#f92672">/</span> edges<span style="color:#f92672">.</span>max()
+</span></span><span style="display:flex;"><span>edges <span style="color:#f92672">=</span> edges<span style="color:#f92672">.</span>astype(np<span style="color:#f92672">.</span>uint8)</span></span></code></pre></div>
+<p>Finally, we write out the results to disk,</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>imsave(
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;results&#34;</span>, <span style="color:#e6db74">&#34;colour_cartoon.png&#34;</span>),
+</span></span><span style="display:flex;"><span>    cv2<span style="color:#f92672">.</span>cvtColor(cartoon, cv2<span style="color:#f92672">.</span>COLOR_BGR2RGB),
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>imsave(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;results&#34;</span>, <span style="color:#e6db74">&#34;colour_edges.png&#34;</span>), edges, cmap<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;grey&#34;</span>)</span></span></code></pre></div>
+<p>and gaze upon the fruits of our labour:</p>
+<figure>
+	<div class="multi-image">
+		<img src="grayscale_cartoon.png", width="40%">
+		<img src="grayscale_edges.png", width="40%">
+	</div>
+    <figcaption><p>Segmentation of the legendary picture of Per Enflo&#39;s goose award ceremony</p></figcaption>
+</figure>
+      </div>
+
+
+      <footer>
+        
+
+<section class="see-also">
+  
+    
+    
+    
+      <h3 id="see-also-in-mumford-shah-image-segmentation">
+        See also in Mumford-Shah Image Segmentation
+        <a class="heading-link" href="#see-also-in-mumford-shah-image-segmentation">
+          <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+          <span class="sr-only">Link to heading</span>
+        </a>
+      </h3>
+      <nav>
+        <ul>
+        
+        
+          
+        
+          
+            <li>
+              <a href="/posts/mumford-shah-equations/">Mumford-Shah Segmentation: Deriving the Equations</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="/posts/mumford-shah-intro/">Image Segmentation using the Mumford-Shah functional</a>
+            </li>
+          
+        
+        </ul>
+      </nav>
+    
+  
+</section>
+
+
+        
+        
+        
+        
+        
+
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2022 -
+    
+    2024
+     Othman El Hammouchi 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+  
+  
+  <script src="/js/plyr.min.8537ca66f236f20d383a4be510f5da50a2bd3d7c4464b11f1968461eefaf00d1.js" integrity="sha256-hTfKZvI28g04OkvlEPXaUKK9PXxEZLEfGWhGHu&#43;vANE="></script>
+  
+  
+  
+  
+  <script src="/js/mathjax-config.min.3b9893c399025c9bd37a95cbd1a323be25402140dba10377bf23467199a66f7e.js" integrity="sha256-O5iTw5kCXJvTepXL0aMjviVAIUDboQN3vyNGcZmmb34="></script>
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+
+</html>
