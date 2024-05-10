@@ -36,15 +36,16 @@ enableEmoji = true
   # Right To Left, shift content direction for languagues such as Arabic
   rtl = false
 
-  math = false # disable KaTeX, we use MathJax
+  math = false                  # disable KaTeX, we use MathJax
   colorScheme = "auto"
   hideColorSchemeToggle = false
 
   # Series see also post count
   maxSeeAlsoItems = 5
+  maxFrontPagePosts = 3
 
   # Custom CSS
-  customCSS = []
+  customCSS = ["css/custom.css"]
 
   # Custom SCSS, file path is relative to Hugo's asset folder (default: {your project root}/assets)
   customSCSS = []
