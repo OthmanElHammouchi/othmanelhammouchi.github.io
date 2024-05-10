@@ -20,7 +20,16 @@ $$ \begin{cases} \boldsymbol{g} = (g_1, g_2, g_3) \\[2em] \boldsymbol{u} = (u_1,
     </item>
     
     <item>
-      <title>Mumford Shah Segmentation: Implementing the Algorithm</title>
+      <title>Fancy thread safe progress bar in R for compiled code</title>
+      <link>https://othmanelhammouchi.com/posts/r-parallel-progress/</link>
+      <pubDate>Mon, 15 Apr 2024 20:09:08 +0200</pubDate>
+      
+      <guid>https://othmanelhammouchi.com/posts/r-parallel-progress/</guid>
+      <description>I&amp;rsquo;ve been working a lot recently on organising the code I wrote for my master&amp;rsquo;s thesis into an R package to hopefully get it published on CRAN. Since the calculations involved are rather intensive, I chose to implement them in C++ and Fortran, and used the OpenMP API to parallelise them. After many grueling hours of debugging segfaults, the package finally seemed to be coming together, but there was still one aspect I couldn&amp;rsquo;t quite get right: tracking progress.</description>
+    </item>
+    
+    <item>
+      <title>Mumford Shah: Implementing the Algorithm</title>
       <link>https://othmanelhammouchi.com/posts/mumford-shah-implementation/</link>
       <pubDate>Sun, 14 Aug 2022 16:43:54 +0200</pubDate>
       
@@ -30,7 +39,7 @@ $$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em]
     </item>
     
     <item>
-      <title>Mumford-Shah Segmentation: Deriving the Equations</title>
+      <title>Mumford-Shah: Deriving the Equations</title>
       <link>https://othmanelhammouchi.com/posts/mumford-shah-equations/</link>
       <pubDate>Sun, 14 Aug 2022 16:43:54 +0200</pubDate>
       

@@ -20,7 +20,7 @@ $$ \begin{cases} \boldsymbol{g} = (g_1, g_2, g_3) \\[2em] \boldsymbol{u} = (u_1,
     </item>
     
     <item>
-      <title>Mumford Shah Segmentation: Implementing the Algorithm</title>
+      <title>Mumford Shah: Implementing the Algorithm</title>
       <link>https://othmanelhammouchi.com/posts/mumford-shah-implementation/</link>
       <pubDate>Sun, 14 Aug 2022 16:43:54 +0200</pubDate>
       
@@ -30,7 +30,7 @@ $$ \begin{cases} \displaystyle (u - g) - \nabla \cdot (v^2 \nabla u) = 0 \\[1em]
     </item>
     
     <item>
-      <title>Mumford-Shah Segmentation: Deriving the Equations</title>
+      <title>Mumford-Shah: Deriving the Equations</title>
       <link>https://othmanelhammouchi.com/posts/mumford-shah-equations/</link>
       <pubDate>Sun, 14 Aug 2022 16:43:54 +0200</pubDate>
       

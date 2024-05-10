@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R on Othman El Hammouchi</title>
+    <link>https://othmanelhammouchi.com/tags/r/</link>
+    <description>Recent content in R on Othman El Hammouchi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 15 Apr 2024 20:09:08 +0200</lastBuildDate><atom:link href="https://othmanelhammouchi.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fancy thread safe progress bar in R for compiled code</title>
+      <link>https://othmanelhammouchi.com/posts/r-parallel-progress/</link>
+      <pubDate>Mon, 15 Apr 2024 20:09:08 +0200</pubDate>
+      
+      <guid>https://othmanelhammouchi.com/posts/r-parallel-progress/</guid>
+      <description>I&amp;rsquo;ve been working a lot recently on organising the code I wrote for my master&amp;rsquo;s thesis into an R package to hopefully get it published on CRAN. Since the calculations involved are rather intensive, I chose to implement them in C++ and Fortran, and used the OpenMP API to parallelise them. After many grueling hours of debugging segfaults, the package finally seemed to be coming together, but there was still one aspect I couldn&amp;rsquo;t quite get right: tracking progress.</description>
+    </item>
+    
+  </channel>
+</rss>
