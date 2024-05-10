@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2022-08-14T16:43:54+02:00
-title = "Mumford-Shah Segmentation: Deriving the Equations"
+title = "Mumford-Shah: Deriving the Equations"
 description = ""
 slug = ""
 authors = ["Othman El Hammouchi"]
